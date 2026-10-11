@@ -17,15 +17,17 @@ export default function HiringHandoff({
   onRestart,
 }: HiringHandoffProps) {
   const [commitment, setCommitment] = useState(true);
+  const [scenario, setScenario] = useState<"guided" | "hypothetical">("guided");
 
   const hasClaim =
     review.decision !== "reject" && Boolean(review.claim);
 
-  // A guided developer test cannot establish independent capability.
-  const independentVerification = false;
+  // Hypothetical mode illustrates a stipulated qualifying-proof condition.
+  // It does not assert that independent verification actually occurred.
+  const hypotheticalQualification = scenario === "hypothetical";
 
   const waiverAvailable =
-    hasClaim && commitment && independentVerification;
+    hasClaim && commitment && hypotheticalQualification;
 
   return (
     <section className="mx-auto max-w-4xl">
@@ -128,6 +130,61 @@ export default function HiringHandoff({
       </div>
 
       <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+        <h2 className="text-xl font-semibold">
+          Demonstration scenario
+        </h2>
+
+        <p className="mt-3 text-sm leading-7 text-slate-600">
+          Choose which simulated conditions to illustrate.
+          This selection does not change the recorded answers
+          or create real independent verification.
+        </p>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => setScenario("guided")}
+            aria-pressed={scenario === "guided"}
+            className={`rounded-xl border p-4 text-left ${
+              scenario === "guided"
+                ? "border-[#237d70] bg-[#edf5f3]"
+                : "border-slate-200"
+            }`}
+          >
+            <p className="text-sm font-semibold">Guided developer test</p>
+            <p className="mt-2 text-xs leading-5 text-slate-600">
+              Actual guided inputs. Independent capability not established.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setScenario("hypothetical")}
+            aria-pressed={scenario === "hypothetical"}
+            className={`rounded-xl border p-4 text-left ${
+              scenario === "hypothetical"
+                ? "border-[#237d70] bg-[#edf5f3]"
+                : "border-slate-200"
+            }`}
+          >
+            <p className="text-sm font-semibold">
+              Hypothetical qualifying proof
+            </p>
+            <p className="mt-2 text-xs leading-5 text-slate-600">
+              Assume verification requirements are satisfied for this simulation.
+            </p>
+          </button>
+        </div>
+
+        {hypotheticalQualification && (
+          <p className="mt-5 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+            Counterfactual simulation only. Qualifying independent
+            verification is assumed, not demonstrated by this test.
+          </p>
+        )}
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-widest text-[#237d70]">
           Simulated employer agreement
         </p>
@@ -165,6 +222,10 @@ export default function HiringHandoff({
           {waiverAvailable ? (
             <p className="mt-3 text-sm font-semibold text-[#176457]">
               First work-sample test waived
+              <span className="mt-2 block text-xs font-normal">
+                Simulated consequence under hypothetical qualifying conditions.
+                No real hiring step was waived.
+              </span>
             </p>
           ) : !commitment ? (
             <p className="mt-3 text-sm leading-7 text-slate-700">

@@ -57,6 +57,13 @@ export default function Home() {
         [field]: value,
       },
     }));
+
+    // Changing base evidence invalidates every downstream decision.
+    setBaseSubmitted(false);
+    setTransferSubmitted(false);
+    setTransferDecision("");
+    setTransferRationale("");
+    setReviewResult(null);
     setTaskError("");
   };
 
@@ -330,6 +337,8 @@ export default function Home() {
                     value={transferDecision}
                     onChange={(event) => {
                       setTransferDecision(event.target.value);
+                      setTransferSubmitted(false);
+                      setReviewResult(null);
                       setTransferError("");
                     }}
                     className="mt-2 w-full rounded-xl border border-slate-300 bg-white p-3 text-sm"
@@ -352,6 +361,8 @@ export default function Home() {
                     value={transferRationale}
                     onChange={(event) => {
                       setTransferRationale(event.target.value);
+                      setTransferSubmitted(false);
+                      setReviewResult(null);
                       setTransferError("");
                     }}
                     maxLength={500}
