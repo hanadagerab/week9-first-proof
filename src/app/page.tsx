@@ -257,6 +257,7 @@ export default function Home() {
           />
         ) : stage === "packet" && baseSubmitted && transferSubmitted ? (
           <EvidencePacket
+              reviewResult={reviewResult}
             original={answers["C01"]}
             revised={{
               decision: transferDecision,

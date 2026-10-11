@@ -1,4 +1,7 @@
+
 "use client";
+
+import type { ReviewResult } from "./HumanReview";
 
 type Answer = {
   decision: string;
@@ -6,6 +9,7 @@ type Answer = {
 };
 
 type EvidencePacketProps = {
+  reviewResult: ReviewResult | null;
   original: Answer;
   revised: Answer;
   assistance: string;
@@ -21,6 +25,7 @@ const decisionLabels: Record<string, string> = {
 };
 
 export default function EvidencePacket({
+  reviewResult,
   original,
   revised,
   assistance,
@@ -53,8 +58,17 @@ export default function EvidencePacket({
     {
       title: "Human verification",
       detail:
-        "A trained human reviewer must inspect the evidence before any portable claim exists.",
-      status: "Pending",
+        reviewResult?.decision === "reject"
+        ? "A fictional human reviewer rejected the proposed claim. No portable proof was generated."
+        : reviewResult
+          ? "A fictional reviewer decision was recorded. This does not establish independently verified capability."
+          : "A trained human reviewer must inspect the evidence before any portable claim exists.",
+      status:
+        reviewResult?.decision === "reject"
+          ? "Rejected · no portable proof"
+          : reviewResult
+            ? "Reviewed · fictional demo"
+            : "Pending",
     },
   ];
 
