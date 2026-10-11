@@ -1,69 +1,308 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
 
 export default function Home() {
+  const [started, setStarted] = useState(false);
+  const [considered, setConsidered] = useState(true);
+  const [stage, setStage] = useState<"consideration" | "evidence">("consideration");
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-[#f7f8fa] text-[#17253d]">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#173e46] text-lg font-semibold text-white">
+              F
+            </div>
+            <div>
+              <p className="font-semibold tracking-tight">First-proof</p>
+              <p className="text-xs text-slate-500">Hiring Handoff Lab</p>
+            </div>
+          </div>
+          <span className="rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-500">
+            Fictional demo data
+          </span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </header>
+
+      <div className="mx-auto max-w-6xl px-6 py-12">
+        <div className="mb-10 flex items-center gap-3 text-sm text-slate-500">
+          <span className="rounded-full bg-[#dceee9] px-3 py-1 font-medium text-[#176457]">
+            Week 09 / Operator
+          </span>
+          <span>Evidence → Review → Hiring action</span>
         </div>
-      </main>
-    </div>
+
+        {!started ? (
+          <section className="grid items-center gap-12 lg:grid-cols-2">
+            <div>
+              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-[#237d70]">
+                A different kind of hiring evidence
+              </p>
+              <h1 className="max-w-xl text-5xl font-semibold leading-[1.12] tracking-tight md:text-6xl">
+                Proof should change what happens next.
+              </h1>
+              <p className="mt-6 max-w-lg text-lg leading-8 text-slate-600">
+                First-proof turns bounded, observable work evidence into a
+                narrow human-reviewed claim connected to one pre-agreed hiring
+                action.
+              </p>
+              <p className="mt-4 max-w-lg text-sm leading-6 text-slate-500">
+                Not a candidate ranking, universal credential, or automated
+                hiring decision. This simulation uses invented people and
+                training materials only.
+              </p>
+              <button
+                onClick={() => setStarted(true)}
+                className="mt-8 rounded-xl bg-[#173e46] px-7 py-4 font-semibold text-white shadow-sm transition hover:bg-[#245861]"
+              >
+                Explore the hiring handoff →
+              </button>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_18px_65px_rgba(20,40,60,0.07)]">
+              <div className="mb-7 flex items-center justify-between">
+                <span className="text-sm font-semibold">Handoff preview</span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-500">
+                  Simulation
+                </span>
+              </div>
+              {[
+                ["01", "Candidate already in consideration"],
+                ["02", "Existing evidence reviewed first"],
+                ["03", "Bounded demonstration if needed"],
+                ["04", "Human reviewer decides"],
+                ["05", "Named hiring step changes"],
+              ].map(([number, text]) => (
+                <div
+                  key={number}
+                  className="flex gap-4 border-t border-slate-100 py-5"
+                >
+                  <span className="font-mono text-sm text-[#237d70]">
+                    {number}
+                  </span>
+                  <span className="text-sm font-medium">{text}</span>
+                </div>
+              ))}
+              <div className="mt-4 rounded-xl bg-[#edf5f3] p-4 text-sm text-[#245e54]">
+                Valid proof → First work-sample test waived
+                <p className="mt-1 text-xs opacity-75">
+                  Simulated employer commitment, agreed before the pilot.
+                </p>
+              </div>
+            </div>
+          </section>
+        ) : stage === "evidence" ? (
+          <section className="mx-auto max-w-4xl">
+            <p className="text-sm font-medium text-[#237d70]">
+              STEP 02 / EXISTING EVIDENCE
+            </p>
+            <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+              Start with what already exists.
+            </h1>
+            <p className="mt-4 max-w-2xl leading-7 text-slate-600">
+              Before asking Daniela to complete new work, First-proof checks
+              whether her existing records support the specific capability
+              the employer needs to understand.
+            </p>
+
+            <div className="mt-8 grid gap-4">
+              {[
+                {
+                  title: "Customer follow-up log",
+                  source: "Closed customer contact record",
+                  supports: "Documented follow-up and case ownership",
+                  gap: "Does not establish judgment under plant-specific constraints.",
+                },
+                {
+                  title: "Issue-resolution notes",
+                  source: "Prior customer-service task record",
+                  supports: "Clear documentation of routine resolutions",
+                  gap: "Does not establish behavior when authority changes.",
+                },
+                {
+                  title: "Escalation record",
+                  source: "Previous-context escalation artifact",
+                  supports: "Evidence that an issue was referred for review",
+                  gap: "Does not establish transfer to the target operating context.",
+                },
+              ].map((item, index) => (
+                <article
+                  key={item.title}
+                  className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-medium text-[#237d70]">
+                        TRACE 0{index + 1}
+                      </p>
+                      <h2 className="mt-2 text-lg font-semibold">
+                        {item.title}
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {item.source}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
+                      Fictional · attributed in demo
+                    </span>
+                  </div>
+                  <div className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        What it supports
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-slate-700">
+                        {item.supports}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        What remains unproven
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-slate-700">
+                        {item.gap}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-[#c7ded8] bg-[#edf5f3] p-6">
+              <p className="text-sm font-semibold text-[#176457]">
+                Evidence sufficiency decision
+              </p>
+              <h2 className="mt-2 text-xl font-semibold">
+                Existing traces are useful, but insufficient.
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                These records support aspects of customer handling, but do
+                not establish escalation judgment under changed conditions
+                in the target plant context. A bounded training
+                demonstration is therefore needed.
+              </p>
+              <p className="mt-3 text-xs text-slate-500">
+                Check recognized evidence first, including relevant
+                existing competency certification. No new certification
+                is claimed here.
+              </p>
+            </div>
+
+            <button
+              onClick={() => alert("Next build slice: neutral onboarding and bounded training task.")}
+              className="mt-7 w-full rounded-xl bg-[#173e46] px-6 py-4 font-semibold text-white transition hover:bg-[#245861]"
+            >
+              Continue to bounded training task →
+            </button>
+
+            <button
+              onClick={() => setStage("consideration")}
+              className="mt-5 text-sm text-slate-500 hover:text-slate-900"
+            >
+              ← Back to consideration
+            </button>
+          </section>
+        ) : (
+          <section className="mx-auto max-w-3xl">
+            <div className="mb-6">
+              <p className="text-sm font-medium text-[#237d70]">
+                STEP 01 / CONSIDERATION
+              </p>
+              <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+                Before evidence enters the process.
+              </h1>
+              <p className="mt-3 text-slate-600">
+                First-proof is available only after the employer has already
+                placed the candidate in consideration.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-slate-400">
+                    Fictional candidate
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold">Daniela Ruiz</h2>
+                  <p className="mt-2 text-sm text-slate-500">
+                    Junior Customer Operations Coordinator
+                  </p>
+                </div>
+                <span className="rounded-full bg-[#e5f4ee] px-3 py-2 text-xs font-semibold text-[#176457]">
+                  {considered
+                    ? "Already in consideration"
+                    : "Not in consideration"}
+                </span>
+              </div>
+
+              <div className="my-7 border-t border-slate-100" />
+
+              <p className="mb-4 text-sm font-semibold">
+                Candidate consideration status
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  onClick={() => setConsidered(true)}
+                  className={`rounded-xl border p-4 text-left text-sm ${
+                    considered
+                      ? "border-[#237d70] bg-[#edf5f3] text-[#176457]"
+                      : "border-slate-200"
+                  }`}
+                >
+                  Already in consideration
+                </button>
+                <button
+                  onClick={() => setConsidered(false)}
+                  className={`rounded-xl border p-4 text-left text-sm ${
+                    !considered
+                      ? "border-slate-600 bg-slate-100"
+                      : "border-slate-200"
+                  }`}
+                >
+                  Not in consideration
+                </button>
+              </div>
+
+              <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+                First-proof did not determine application eligibility or initial
+                review order. It cannot rank candidates or automatically reject
+                anyone.
+              </div>
+
+              {considered ? (
+                <div className="mt-6 rounded-xl bg-[#edf5f3] p-4 text-sm text-[#176457]">
+                  Consideration confirmed. Existing evidence review is the
+                  next stage.
+                </div>
+              ) : (
+                <div className="mt-6 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
+                  Evidence access locked. The candidate must first enter the
+                  normal hiring consideration process.
+                </div>
+              )}
+
+              <button
+                disabled={!considered}
+                onClick={() =>
+                  setStage("evidence")
+                }
+                className="mt-7 w-full rounded-xl bg-[#173e46] px-6 py-4 font-semibold text-white transition hover:bg-[#245861] disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                Continue to existing evidence →
+              </button>
+            </div>
+
+            <button
+              onClick={() => setStarted(false)}
+              className="mt-6 text-sm text-slate-500 hover:text-slate-900"
+            >
+              ← Back to overview
+            </button>
+          </section>
+        )}
+      </div>
+    </main>
   );
 }
