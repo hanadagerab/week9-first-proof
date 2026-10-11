@@ -1,11 +1,119 @@
 "use client";
 
 import { useState } from "react";
+import EvidencePacket from "@/components/EvidencePacket";
 
 export default function Home() {
   const [started, setStarted] = useState(false);
   const [considered, setConsidered] = useState(true);
-  const [stage, setStage] = useState<"consideration" | "evidence">("consideration");
+  const [stage, setStage] = useState<"consideration" | "evidence" | "onboarding" | "task" | "transfer" | "packet">("consideration");
+
+
+  const cases = [
+    {
+      id: "C01",
+      title: "Delivery confirmation",
+      description:
+        "A customer asks whether an order marked dispatched yesterday has arrived. The tracking record shows delivery completed, and the customer requests the confirmation reference. Your role allows you to share recorded shipment information.",
+    },
+    {
+      id: "C02",
+      title: "Requested quantity change",
+      description:
+        "A customer requests an increase from 100 to 160 units on an order already released to production. You can document requests and communicate approved changes, but cannot independently change released production quantities.",
+    },
+    {
+      id: "C03",
+      title: "Missing shipment information",
+      description:
+        "A customer asks when a replacement component will arrive. The available record contains an order number but no confirmed dispatch date. You may check the record and request additional information.",
+    },
+    {
+      id: "C04",
+      title: "Invoice reference",
+      description:
+        "A customer asks for a copy of an invoice associated with a completed order. The invoice is available in the approved customer record, and your role permits sharing existing invoice documents.",
+    },
+  ];
+
+  const [answers, setAnswers] = useState<
+    Record<string, { decision: string; rationale: string }>
+  >({});
+
+  const [taskError, setTaskError] = useState("");
+
+  const updateAnswer = (
+    id: string,
+    field: "decision" | "rationale",
+    value: string
+  ) => {
+    setAnswers((previous) => ({
+      ...previous,
+      [id]: {
+        decision: previous[id]?.decision ?? "",
+        rationale: previous[id]?.rationale ?? "",
+        [field]: value,
+      },
+    }));
+    setTaskError("");
+  };
+
+
+  const [baseSubmitted, setBaseSubmitted] = useState(false);
+  const [transferDecision, setTransferDecision] = useState("");
+  const [transferRationale, setTransferRationale] = useState("");
+  const [transferError, setTransferError] = useState("");
+  const [transferSubmitted, setTransferSubmitted] = useState(false);
+  const [assistanceDisclosure, setAssistanceDisclosure] = useState(
+    "Developer-provided example responses used in this guided fictional test."
+  );
+
+  const submitTransfer = () => {
+    if (!baseSubmitted) {
+      setTransferError("Complete the base task first.");
+      return;
+    }
+
+    if (
+      !["resolve", "escalate", "clarify"].includes(transferDecision) ||
+      transferRationale.trim().length < 20 ||
+      transferRationale.trim().length > 500
+    ) {
+      setTransferError(
+        "Choose an action and provide a rationale of 20–500 characters."
+      );
+      return;
+    }
+
+    setTransferSubmitted(true);
+    setTransferError("");
+  };
+
+  const submitTask = () => {
+    const valid = cases.every((item) => {
+      const answer = answers[item.id];
+      return (
+        answer &&
+        ["resolve", "escalate", "clarify"].includes(answer.decision) &&
+        answer.rationale.trim().length >= 15 &&
+        answer.rationale.trim().length <= 500
+      );
+    });
+
+    if (!valid) {
+      setTaskError(
+        "Complete all four decisions and provide a rationale of 15–500 characters for each case."
+      );
+      return;
+    }
+
+    setTaskError("");
+    setBaseSubmitted(true);
+    setTransferSubmitted(false);
+    setTransferDecision("");
+    setTransferRationale("");
+    setStage("transfer");
+  };
 
   return (
     <main className="min-h-screen bg-[#f7f8fa] text-[#17253d]">
@@ -92,6 +200,353 @@ export default function Home() {
                 </p>
               </div>
             </div>
+          </section>
+
+
+
+        ) : stage === "packet" && baseSubmitted && transferSubmitted ? (
+          <EvidencePacket
+            original={answers["C01"]}
+            revised={{
+              decision: transferDecision,
+              rationale: transferRationale,
+            }}
+            assistance={assistanceDisclosure}
+            onAssistanceChange={setAssistanceDisclosure}
+            onContinue={() =>
+              alert("Human review is the next build slice.")
+            }
+            onBack={() => setStage("transfer")}
+          />
+        ) : stage === "transfer" && baseSubmitted ? (
+          <section className="mx-auto max-w-4xl">
+            <p className="text-sm font-medium text-[#237d70]">
+              STEP 05 / CHANGED-CONSTRAINT FOLLOW-UP
+            </p>
+
+            <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+              The situation has changed.
+            </h1>
+
+            <p className="mt-4 max-w-2xl leading-7 text-slate-600">
+              You have already submitted your original case decisions.
+              New information has now become available. Review it and
+              decide how you would proceed.
+            </p>
+
+            <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+              <p className="text-xs font-semibold tracking-widest text-[#237d70]">
+                ORIGINAL CASE · C01
+              </p>
+
+              <h2 className="mt-2 text-xl font-semibold">
+                Delivery confirmation
+              </h2>
+
+              <div className="mt-5 rounded-xl bg-slate-50 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Your original decision
+                </p>
+                <p className="mt-2 text-sm font-medium text-slate-800">
+                  {answers["C01"]?.decision === "resolve"
+                    ? "Resolve within authority"
+                    : answers["C01"]?.decision === "escalate"
+                    ? "Escalate"
+                    : "Ask for clarification"}
+                </p>
+                <p className="mt-3 text-sm leading-7 text-slate-600">
+                  {answers["C01"]?.rationale}
+                </p>
+              </div>
+
+              <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">
+                  New information
+                </p>
+                <p className="mt-3 text-sm leading-7 text-slate-700">
+                  The customer reports that the shipment was not received.
+                  A newly updated carrier record now marks the delivery
+                  confirmation as disputed. Your role still permits sharing
+                  recorded shipment information, but you cannot independently
+                  certify disputed delivery records or authorize replacements.
+                </p>
+              </div>
+
+              {!transferSubmitted ? (
+                <>
+                  <label
+                    htmlFor="transfer-decision"
+                    className="mt-7 block text-sm font-semibold"
+                  >
+                    What would you do now?
+                  </label>
+
+                  <select
+                    id="transfer-decision"
+                    value={transferDecision}
+                    onChange={(event) => {
+                      setTransferDecision(event.target.value);
+                      setTransferError("");
+                    }}
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-white p-3 text-sm"
+                  >
+                    <option value="">Select an action</option>
+                    <option value="resolve">Resolve within authority</option>
+                    <option value="escalate">Escalate</option>
+                    <option value="clarify">Ask for clarification</option>
+                  </select>
+
+                  <label
+                    htmlFor="transfer-rationale"
+                    className="mt-6 block text-sm font-semibold"
+                  >
+                    Explain why you would keep or change your decision
+                  </label>
+
+                  <textarea
+                    id="transfer-rationale"
+                    value={transferRationale}
+                    onChange={(event) => {
+                      setTransferRationale(event.target.value);
+                      setTransferError("");
+                    }}
+                    maxLength={500}
+                    rows={5}
+                    placeholder="Explain how the new information affects your decision..."
+                    className="mt-2 w-full rounded-xl border border-slate-300 p-3 text-sm"
+                  />
+
+                  <p className="mt-2 text-right text-xs text-slate-400">
+                    {transferRationale.length}/500
+                  </p>
+
+                  {transferError && (
+                    <p role="alert" className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
+                      {transferError}
+                    </p>
+                  )}
+
+                  <button
+                    onClick={submitTransfer}
+                    className="mt-7 w-full rounded-xl bg-[#173e46] px-6 py-4 font-semibold text-white hover:bg-[#245861]"
+                  >
+                    Submit changed-constraint response →
+                  </button>
+                </>
+              ) : (
+                <div className="mt-7 rounded-xl bg-[#edf5f3] p-6">
+                  <h3 className="font-semibold text-[#176457]">
+                    Response captured
+                  </h3>
+                  <p className="mt-2 text-sm leading-7 text-slate-600">
+                    Your original and revised decisions have been recorded
+                    in the local demo state. No capability has been
+                    verified and no portable proof exists yet.
+                  </p>
+                  <p className="mt-4 text-sm text-slate-600">
+                    Next: open the structured evidence packet below.
+                  </p>
+                  <button
+                    onClick={() => setStage("packet")}
+                    className="mt-5 rounded-xl bg-[#173e46] px-6 py-3 text-sm font-semibold text-white"
+                  >
+                    Open evidence packet →
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => setStage("task")}
+              className="mt-6 text-sm text-slate-500 hover:text-slate-900"
+            >
+              ← Back to base task
+            </button>
+          </section>
+        ) : stage === "task" ? (
+          <section className="mx-auto max-w-4xl">
+            <p className="text-sm font-medium text-[#237d70]">
+              STEP 04 / BOUNDED TRAINING TASK
+            </p>
+
+            <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+              Customer operations · Case decisions
+            </h1>
+
+            <p className="mt-4 max-w-2xl leading-7 text-slate-600">
+              Review each invented case. Select an action and explain
+              the reasoning behind your decision.
+              No correctness feedback is shown during this task.
+            </p>
+
+            <div className="mt-5 rounded-xl bg-[#edf5f3] p-4 text-sm text-[#176457]">
+              Fictional training materials only · No productive work
+              · No employment decision
+            </div>
+
+            <div className="mt-8 space-y-5">
+              {cases.map((item) => (
+                <article
+                  key={item.id}
+                  className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm"
+                >
+                  <p className="text-xs font-semibold tracking-widest text-[#237d70]">
+                    CASE {item.id}
+                  </p>
+                  <h2 className="mt-2 text-xl font-semibold">
+                    {item.title}
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                    {item.description}
+                  </p>
+
+                  <label
+                    htmlFor={"decision-" + item.id}
+                    className="mt-6 block text-sm font-semibold"
+                  >
+                    Your action
+                  </label>
+
+                  <select
+                    id={"decision-" + item.id}
+                    value={answers[item.id]?.decision ?? ""}
+                    onChange={(event) =>
+                      updateAnswer(item.id, "decision", event.target.value)
+                    }
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-white p-3 text-sm"
+                  >
+                    <option value="">Select an action</option>
+                    <option value="resolve">Resolve within authority</option>
+                    <option value="escalate">Escalate</option>
+                    <option value="clarify">Ask for clarification</option>
+                  </select>
+
+                  <label
+                    htmlFor={"rationale-" + item.id}
+                    className="mt-5 block text-sm font-semibold"
+                  >
+                    Explain your reasoning
+                  </label>
+
+                  <textarea
+                    id={"rationale-" + item.id}
+                    value={answers[item.id]?.rationale ?? ""}
+                    onChange={(event) =>
+                      updateAnswer(item.id, "rationale", event.target.value)
+                    }
+                    maxLength={500}
+                    rows={3}
+                    placeholder="Explain what information and authority informed your decision..."
+                    className="mt-2 w-full rounded-xl border border-slate-300 p-3 text-sm"
+                  />
+                  <p className="mt-2 text-right text-xs text-slate-400">
+                    {answers[item.id]?.rationale?.length ?? 0}/500
+                  </p>
+                </article>
+              ))}
+            </div>
+
+            {taskError && (
+              <p role="alert" className="mt-6 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
+                {taskError}
+              </p>
+            )}
+
+            <button
+              onClick={submitTask}
+              className="mt-7 w-full rounded-xl bg-[#173e46] px-6 py-4 font-semibold text-white transition hover:bg-[#245861]"
+            >
+              Submit four case decisions →
+            </button>
+
+            <button
+              onClick={() => setStage("onboarding")}
+              className="mt-5 text-sm text-slate-500 hover:text-slate-900"
+            >
+              ← Back to onboarding
+            </button>
+          </section>
+        ) : stage === "onboarding" ? (
+          <section className="mx-auto max-w-4xl">
+            <p className="text-sm font-medium text-[#237d70]">
+              STEP 03 / NEUTRAL ONBOARDING
+            </p>
+
+            <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+              Your operating environment.
+            </h1>
+
+            <p className="mt-4 max-w-2xl leading-7 text-slate-600">
+              You will work through fictional customer-operations cases.
+              Read the working conditions before beginning.
+              No real customer information or productive employer work
+              is involved.
+            </p>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {[
+                {
+                  title: "Operating context",
+                  body: "You are supporting customer operations at a fictional manufacturing company. Each case provides the information available at that moment.",
+                },
+                {
+                  title: "Available actions",
+                  body: "For each case, choose Resolve within authority, Escalate, or Ask for clarification. Explain your choice in your own words.",
+                },
+                {
+                  title: "Authority boundary",
+                  body: "You may act only within the authority explicitly described in each case. Do not assume permissions that have not been provided.",
+                },
+                {
+                  title: "Time and tools",
+                  body: "Suggested time: 15 minutes. You may use the case information and your own notes. No external tools or AI assistance are required.",
+                },
+              ].map((item) => (
+                <article
+                  key={item.title}
+                  className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                >
+                  <h2 className="text-lg font-semibold">{item.title}</h2>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                    {item.body}
+                  </p>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+              <h2 className="text-lg font-semibold">
+                Asking for clarification
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                If you need additional information, select
+                Ask for clarification and explain what is missing.
+                Your response will be recorded as part of the
+                fictional demonstration.
+              </p>
+            </div>
+
+            <div className="mt-6 rounded-xl bg-[#edf5f3] p-5 text-sm leading-7 text-[#176457]">
+              Training simulation only. Responses are not employment
+              decisions, hiring recommendations, or predictions of
+              future performance.
+            </div>
+
+            <button
+              onClick={() =>
+                setStage("task")
+              }
+              className="mt-7 w-full rounded-xl bg-[#173e46] px-6 py-4 font-semibold text-white transition hover:bg-[#245861]"
+            >
+              Begin fictional assessment →
+            </button>
+
+            <button
+              onClick={() => setStage("evidence")}
+              className="mt-5 text-sm text-slate-500 hover:text-slate-900"
+            >
+              ← Back to existing evidence
+            </button>
           </section>
         ) : stage === "evidence" ? (
           <section className="mx-auto max-w-4xl">
@@ -191,7 +646,7 @@ export default function Home() {
             </div>
 
             <button
-              onClick={() => alert("Next build slice: neutral onboarding and bounded training task.")}
+              onClick={() => setStage("onboarding")}
               className="mt-7 w-full rounded-xl bg-[#173e46] px-6 py-4 font-semibold text-white transition hover:bg-[#245861]"
             >
               Continue to bounded training task →
