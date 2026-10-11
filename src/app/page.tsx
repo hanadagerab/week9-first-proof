@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import EvidencePacket from "@/components/EvidencePacket";
+import HumanReview, { type ReviewResult } from "@/components/HumanReview";
+import HiringHandoff from "@/components/HiringHandoff";
 
 export default function Home() {
   const [started, setStarted] = useState(false);
   const [considered, setConsidered] = useState(true);
-  const [stage, setStage] = useState<"consideration" | "evidence" | "onboarding" | "task" | "transfer" | "packet">("consideration");
+  const [stage, setStage] = useState<"consideration" | "evidence" | "onboarding" | "task" | "transfer" | "packet" | "review" | "handoff">("consideration");
 
 
   const cases = [
@@ -64,9 +66,28 @@ export default function Home() {
   const [transferRationale, setTransferRationale] = useState("");
   const [transferError, setTransferError] = useState("");
   const [transferSubmitted, setTransferSubmitted] = useState(false);
+  const [reviewResult, setReviewResult] = useState<ReviewResult | null>(null);
   const [assistanceDisclosure, setAssistanceDisclosure] = useState(
     "Developer-provided example responses used in this guided fictional test."
   );
+
+
+  const restartDemo = () => {
+    setStarted(false);
+    setConsidered(true);
+    setStage("consideration");
+    setAnswers({});
+    setTaskError("");
+    setBaseSubmitted(false);
+    setTransferDecision("");
+    setTransferRationale("");
+    setTransferError("");
+    setTransferSubmitted(false);
+    setReviewResult(null);
+    setAssistanceDisclosure(
+      "Developer-provided example responses used in this guided fictional test."
+    );
+  };
 
   const submitTransfer = () => {
     if (!baseSubmitted) {
@@ -204,6 +225,29 @@ export default function Home() {
 
 
 
+
+
+        ) : stage === "handoff" && reviewResult && baseSubmitted && transferSubmitted ? (
+          <HiringHandoff
+            review={reviewResult}
+            assistance={assistanceDisclosure}
+            onBack={() => setStage("review")}
+            onRestart={restartDemo}
+          />
+        ) : stage === "review" && baseSubmitted && transferSubmitted ? (
+          <HumanReview
+            original={answers["C01"]}
+            revised={{
+              decision: transferDecision,
+              rationale: transferRationale,
+            }}
+            assistance={assistanceDisclosure}
+            onComplete={(result) => {
+              setReviewResult(result);
+              setStage("handoff");
+            }}
+            onBack={() => setStage("packet")}
+          />
         ) : stage === "packet" && baseSubmitted && transferSubmitted ? (
           <EvidencePacket
             original={answers["C01"]}
@@ -214,7 +258,7 @@ export default function Home() {
             assistance={assistanceDisclosure}
             onAssistanceChange={setAssistanceDisclosure}
             onContinue={() =>
-              alert("Human review is the next build slice.")
+              setStage("review")
             }
             onBack={() => setStage("transfer")}
           />
