@@ -1,6 +1,8 @@
 
 "use client";
 
+import EmployerVerificationSummary from "./EmployerVerificationSummary";
+
 import type { ReviewResult } from "./HumanReview";
 
 type Answer = {
@@ -86,6 +88,11 @@ export default function EvidencePacket({
         This packet separates observable records, structural checks,
         simulated AI interpretation, and human verification.
       </p>
+
+      <EmployerVerificationSummary
+        assistance={assistance}
+        reviewResult={reviewResult}
+      />
 
       <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
         <h2 className="text-xl font-semibold">Evidence status</h2>
